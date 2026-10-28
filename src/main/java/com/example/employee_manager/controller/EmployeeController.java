@@ -1,12 +1,16 @@
 package com.example.employee_manager.controller;
 
-import com.example.employeemanager.model.Employee;
-import com.example.employeemanager.service.EmployeeService;
+import com.example.employee_manager.model.Employee;
+import com.example.employee_manager.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/employees")
@@ -18,7 +22,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    // 1. Read: Show the form and table of all employees
     @GetMapping
     public String viewHomePage(Model model) {
         model.addAttribute("listEmployees", employeeService.getAllEmployees());
@@ -26,16 +29,13 @@ public class EmployeeController {
         return "employees";
     }
 
-    // 2. Create: Save a new employee (Post-Redirect-Get pattern)
     @PostMapping
-    public String saveEmployee(@Valid @ModelAttribute("employee") Employee employee, 
+    public String saveEmployee(@Valid @ModelAttribute("employee") Employee employee,
                                BindingResult result, Model model) {
-        // Check for duplicate email registration
         if (employeeService.existsByEmail(employee.getEmail()) && employee.getId() == null) {
             result.rejectValue("email", "error.employee", "This email is already registered");
         }
 
-        // If there are validation or duplicate errors, return to the form page
         if (result.hasErrors()) {
             model.addAttribute("listEmployees", employeeService.getAllEmployees());
             return "employees";
@@ -45,22 +45,20 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
-    // 3. Edit: Show the edit form filled with the employee's existing data
     @GetMapping("/{id}/edit")
-    public String showUpdateForm(@PathVariable(value = "id") Long id, Model model) {
+    public String showUpdateForm(@PathVariable Long id, Model model) {
         Employee employee = employeeService.getEmployeeById(id);
         model.addAttribute("employee", employee);
-        return "edit-employee";
+        return "edit-employees";
     }
 
-    // 4. Update: Save the modified employee changes
     @PostMapping("/{id}/update")
-    public String updateEmployee(@PathVariable(value = "id") Long id, 
-                                 @Valid @ModelAttribute("employee") Employee employee, 
+    public String updateEmployee(@PathVariable Long id,
+                                 @Valid @ModelAttribute("employee") Employee employee,
                                  BindingResult result) {
         if (result.hasErrors()) {
             employee.setId(id);
-            return "edit-employee";
+            return "edit-employees";
         }
 
         employee.setId(id);
@@ -68,9 +66,8 @@ public class EmployeeController {
         return "redirect:/employees";
     }
 
-    // 5. Delete: Remove the employee record by ID
     @PostMapping("/{id}/delete")
-    public String deleteEmployee(@PathVariable(value = "id") Long id) {
+    public String deleteEmployee(@PathVariable Long id) {
         employeeService.deleteEmployeeById(id);
         return "redirect:/employees";
     }

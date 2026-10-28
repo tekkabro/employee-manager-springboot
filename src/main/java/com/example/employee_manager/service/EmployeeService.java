@@ -1,7 +1,7 @@
 package com.example.employee_manager.service;
 
-import com.example.employeemanager.model.Employee;
-import com.example.employeemanager.repository.EmployeeRepository;
+import com.example.employee_manager.model.Employee;
+import com.example.employee_manager.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,32 +16,26 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    // Retrieve all employees for the table view
     public List<Employee> getAllEmployees() {
         return employeeRepository.findAll();
     }
 
-    // Save or update an employee record
     public void saveEmployee(Employee employee) {
         employeeRepository.save(employee);
     }
 
-    // Retrieve a single employee by ID (used for the Edit form)
     public Employee getEmployeeById(Long id) {
         Optional<Employee> optional = employeeRepository.findById(id);
         if (optional.isPresent()) {
             return optional.get();
-        } else {
-            throw new RuntimeException("Employee not found for id :: " + id);
         }
+        throw new RuntimeException("Employee not found for id :: " + id);
     }
 
-    // Delete an employee by ID
     public void deleteEmployeeById(Long id) {
         employeeRepository.deleteById(id);
     }
 
-    // Check if an email is already registered in the database
     public boolean existsByEmail(String email) {
         return employeeRepository.existsByEmail(email);
     }

@@ -27,6 +27,7 @@ public class Employee {
     @GeneratedValue
     private Long id;
 
+    @NotBlank(message = "Full name is required")
     @Column(unique=true) 
     private String name;
 
